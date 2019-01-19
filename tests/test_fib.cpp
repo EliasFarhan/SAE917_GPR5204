@@ -52,7 +52,8 @@ int fib_serie(const int i)
 
 static void BM_FibFunc(benchmark::State& state) {
 	
-	for (auto _ : state) {
+	for (auto _ : state)
+	{
 
 		benchmark::DoNotOptimize(fib_func(state.range(0)));
 	}
@@ -62,7 +63,8 @@ BENCHMARK(BM_FibFunc)->Range(fromRange, toRange);
 
 static void BM_FibSerie(benchmark::State& state) {
 
-	for (auto _ : state) {
+	for (auto _ : state)
+	{
 
 		benchmark::DoNotOptimize(fib_serie(state.range(0)));
 	}
