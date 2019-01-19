@@ -51,7 +51,25 @@ static void BM_MultList(benchmark::State& state) {
       benchmark::DoNotOptimize(MultLocalList (m1, m2));
     }
 }
-BENCHMARK(BM_MultList)->Range(fromRange, toRange);
+//BENCHMARK(BM_MultList)->Range(fromRange, toRange);
+
+
+static void BM_MultAlgo(benchmark::State& state) {
+	const int size = state.range(0);
+	std::vector<float> m1;
+	m1.resize(size);
+	RandomFill(&m1[0], size);
+
+	std::vector<float> m2;
+	m2.resize(size);
+	RandomFill(&m2[0], size);
+
+	for (auto _ : state) {
+
+		benchmark::DoNotOptimize(MultLocalVector(m1, m2));
+	}
+}
+BENCHMARK(BM_MultAlgo)->Range(fromRange, toRange);
 
 static void BM_Mult(benchmark::State& state) {
   const int size = state.range (0);
@@ -86,7 +104,7 @@ static void BM_Mult2(benchmark::State& state) {
       benchmark::DoNotOptimize(MultLocal2 (&m1[0],&m2[0],size));
     }
 }
-BENCHMARK(BM_Mult2)->Range(fromRange, toRange);
+//BENCHMARK(BM_Mult2)->Range(fromRange, toRange);
 
 static void BM_Mult4(benchmark::State& state) {
   const int size = state.range (0);
@@ -104,7 +122,7 @@ static void BM_Mult4(benchmark::State& state) {
       benchmark::DoNotOptimize(MultLocal4 (&m1[0], &m2[0], size));
     }
 }
-BENCHMARK(BM_Mult4)->Range(fromRange, toRange);
+//BENCHMARK(BM_Mult4)->Range(fromRange, toRange);
 
 static void BM_Mult8(benchmark::State& state) {
   const int size = state.range (0);
@@ -122,7 +140,7 @@ static void BM_Mult8(benchmark::State& state) {
       benchmark::DoNotOptimize(MultLocal8 (&m1[0],&m2[0],size));
     }
 }
-BENCHMARK(BM_Mult8)->Range(fromRange, toRange);
+//BENCHMARK(BM_Mult8)->Range(fromRange, toRange);
 
 static void BM_Mult16(benchmark::State& state) {
   const int size = state.range (0);
@@ -140,7 +158,7 @@ static void BM_Mult16(benchmark::State& state) {
       benchmark::DoNotOptimize(MultLocal16 (&m1[0],&m2[0],size));
     }
 }
-BENCHMARK(BM_Mult16)->Range(fromRange, toRange);
+//BENCHMARK(BM_Mult16)->Range(fromRange, toRange);
 
 static void BM_Mult32(benchmark::State& state) {
   const int size = state.range (0);
@@ -158,7 +176,7 @@ static void BM_Mult32(benchmark::State& state) {
       benchmark::DoNotOptimize(MultLocal32 (&m1[0],&m2[0],size));
     }
 }
-BENCHMARK(BM_Mult32)->Range(fromRange, toRange);
+//BENCHMARK(BM_Mult32)->Range(fromRange, toRange);
 
 #ifdef __SSE__
 static void BM_Dot128(benchmark::State& state) {

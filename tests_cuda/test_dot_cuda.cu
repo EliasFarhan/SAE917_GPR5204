@@ -3,6 +3,7 @@
 #include <ctime>
 #include <random>
 #include <benchmark/benchmark.h>
+#include <cuda.h>
 
 #define THREADS_PER_BLOCK 512
 

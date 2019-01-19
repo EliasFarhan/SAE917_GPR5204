@@ -4,7 +4,12 @@
 
 float MultLocalList(std::list<float>& m1, std::list<float>& m2)
 {
-  return std::inner_product(m1.begin(), m1.end(), m2.begin(),0);
+  return std::inner_product(m1.begin(), m1.end(), m2.begin(),0.0f);
+}
+
+float MultLocalVector(std::vector<float>& m1, std::vector<float>& m2)
+{
+	return std::inner_product(m1.begin(), m1.end(), m2.begin(), 0.0f);
 }
 
 float MultLocal(float * m1, float * m2, const int width)
@@ -51,6 +56,29 @@ float MultLocal4 (const float *const m1, const float *const m2, const int width)
         result += m1[i]*m2[i];
     }
     return result;
+}
+
+
+float MultLocal4Vect (const float *const m1, const float *const m2, const int width)
+{
+  float result1 = 0.0f;
+  float result2 = 0.0f;
+  float result3 = 0.0f;
+  float result4 = 0.0f;
+  const int vectorSize = 4;
+  for(int i = 0; i < width; i=i+vectorSize)
+    {
+      result1 += m1[i] * m2[i];
+      result2 += m1[i+1] * m2[i+1];
+      result3 += m1[i+2] * m2[i+2];
+      result4 += m1[i+3] * m2[i+3];
+    }
+  const int start = (width/vectorSize)*vectorSize;
+  for(int i = start; i<width;i++)
+    {
+      result4 += m1[i]*m2[i];
+    }
+  return result1+result2+result3+result4;
 }
 float MultLocal8(const float * const m1, const float * const m2, const int width)
 {

@@ -41,7 +41,7 @@ foreach(course_file ${COURSE_FILES} )
 	IF(MSVC)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2 /Oi")
     elseif(UNIX)
-set_target_properties(${course_name} PROPERTIES COMPILE_FLAGS "-save-temps -ffast-math -march=native")
+    set_target_properties(${course_name} PROPERTIES COMPILE_FLAGS "-save-temps -ffast-math -march=native")
     ENDIF(MSVC)
     set_target_properties (${course_name} PROPERTIES
         FOLDER Courses)

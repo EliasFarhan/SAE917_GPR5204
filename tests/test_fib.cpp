@@ -28,26 +28,35 @@ SOFTWARE.
 const int fromRange = 2;
 const int toRange = 1024;
 
+float powf_optimal(const float a, const int n)
+{
+	float result = 1.0f;
+	for(int i = 0; i < n; i++)
+	{
+		result *= a;
+	}
+	return result;
+}
+
 int fib_func(const int i)
 {
 	const float gold_number = (1.0f + sqrtf(5.0f)) / 2.0f;
-	return round(pow(gold_number, i) / sqrtf(5.0f));
+	return roundf(powf_optimal (gold_number, i) / sqrtf(5.0f));
 }
 
-int fib_serie(const int i)
+int fib_serie(const int n)
 {
-	if (i == 0) return 0;
-	if (i == 1) return 1;
+	if (n == 0) return 0;
+	if (n == 1) return 1;
 	int first = 0;
 	int second = 1;
-	for (int n = 1; n < i; n++)
+	for (int j = 1; j < n; j++)
 	{
 		const int tmp = first + second;
 		first = second;
 		second = tmp;
 	}
 	return second;
-
 }
 
 static void BM_FibFunc(benchmark::State& state) {
@@ -58,7 +67,7 @@ static void BM_FibFunc(benchmark::State& state) {
 		benchmark::DoNotOptimize(fib_func(state.range(0)));
 	}
 }
-BENCHMARK(BM_FibFunc)->Range(fromRange, toRange);
+BENCHMARK(BM_FibFunc)->RangeMultiplier(2)->Range(fromRange, toRange);
 
 
 static void BM_FibSerie(benchmark::State& state) {
@@ -69,6 +78,6 @@ static void BM_FibSerie(benchmark::State& state) {
 		benchmark::DoNotOptimize(fib_serie(state.range(0)));
 	}
 }
-BENCHMARK(BM_FibSerie)->Range(fromRange, toRange);
+BENCHMARK(BM_FibSerie)->RangeMultiplier(2)->Range(fromRange, toRange);
 
 BENCHMARK_MAIN();
