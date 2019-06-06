@@ -11,11 +11,10 @@ static std::mutex mtx;
 
 void MrPlus(int* prout)
 {
-  for(int i = 0; i< 1000; i++)
+  for(int i = 0; i < 1000; i++)
     {
       std::lock_guard<std::mutex> lock(mtx);
-      (*prout)+=4;
-      return;
+      (*prout) += 4;
     }
 
 }
@@ -23,13 +22,11 @@ void MrPlus(int* prout)
 
 void MrMinus(int* prout)
 {
-  for(int i = 0; i< 1000; i++)
+  for(int i = 0; i < 1000; i++)
     {
 
       std::lock_guard<std::mutex> lock(mtx);
-      (*prout)-=4;
-
-      return;
+      (*prout) -= 4;
     }
 }
 
@@ -50,6 +47,6 @@ int main()
   t5.join ();
   t6.join ();
 
-  std::cout << "Prout: "<<(prout) <<"\n";
+  std::cout << "Prout: " << (prout) <<"\n";
 }
 

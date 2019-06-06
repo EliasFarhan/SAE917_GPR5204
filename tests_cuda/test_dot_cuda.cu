@@ -9,6 +9,7 @@
 
 static const int fromRange = 256;
 static const int toRange = 1<<20;
+
 // Kernel function to add the elements of two arrays
 __global__
 void dot(float *x, float *y, float* result)
