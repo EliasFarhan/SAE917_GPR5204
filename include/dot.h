@@ -39,6 +39,17 @@ SOFTWARE.
 #include <list>
 #include <vector>
 
+struct Vec4
+{
+    float x,y,z,w;
+};
+
+float MultArray(const Vec4 *vec4_a1, const Vec4 *vec4_a2, const size_t length);
+//Need data to be aligned XXXXYYYYZZZZWWWW
+float MultArraySSE(const float *vec4_a1, const float *vec4_a2, const size_t length);
+//Need data to be aligned XXXXXXXXYYYYYYYYZZZZZZZZWWWWWWWWW
+float MultArrayAVX(const float *vec4_a1, const float *vec4_a2, const size_t length);
+
 float MultLocalList(std::list<float>& m1, std::list<float>& m2);
 float MultLocalVector(std::vector<float>& m1, std::vector<float>& m2);
 float MultLocal(const float * const m1, const float * const m2, const int width);

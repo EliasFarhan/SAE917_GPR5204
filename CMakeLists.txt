@@ -2,6 +2,43 @@ cmake_minimum_required(VERSION 3.9)
 project(GPR5204)
 
 
+
+if(UNIX AND NOT APPLE)
+    MESSAGE("Linux Compiler ${CMAKE_CXX_COMPILER_ID}")
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        MESSAGE("LLVM_ROOT ${LLVM_ROOT}")
+        # using Clang
+
+        if(LLVM_ROOT)
+            set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --stdlib=libc++ -I${LLVM_ROOT}/include/c++/v1/ -L${LLVM_ROOT}/lib -Wl,-rpath,${LLVM_ROOT}/lib  -lc++ -lc++abi ")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -nostdinc++")
+
+            include_directories(${LLVM_ROOT}/include/c++/v1/)
+            LIST(APPEND Neko_LIBRARIES
+                    c++fs)
+            SET (CMAKE_AR      "${LLVM_ROOT}/bin/llvm-ar")
+            SET (CMAKE_LINKER  "${LLVM_ROOT}/bin/llvm-ld")
+            SET (CMAKE_NM      "${LLVM_ROOT}/bin/llvm-nm")
+            SET (CMAKE_OBJDUMP "${LLVM_ROOT}/bin/llvm-objdump")
+            SET (CMAKE_RANLIB  "${LLVM_ROOT}/bin/llvm-ranlib")
+                #Google benchmark specifics
+            SET(BENCHMARK_USE_LIBCXX ON)
+            set(RUN_HAVE_STD_REGEX 0)
+            set(RUN_HAVE_POSIX_REGEX 0)
+        else()
+            set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+        endif()
+
+    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        # using GCC
+        LIST(APPEND Neko_LIBRARIES
+                stdc++fs)
+    endif()
+
+
+ENDIF()
+
+
 if(UNIX)
     if(CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
         message(" * C++ compiler: Emscripten")
@@ -41,7 +78,7 @@ foreach(course_file ${COURSE_FILES} )
 	IF(MSVC)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2 /Oi")
     elseif(UNIX)
-    set_target_properties(${course_name} PROPERTIES COMPILE_FLAGS "-save-temps -ffast-math -march=native")
+    set_target_properties(${course_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=native")
     ENDIF(MSVC)
     set_target_properties (${course_name} PROPERTIES
         FOLDER Courses)

@@ -26,6 +26,7 @@ SOFTWARE.
 #include <numeric>
 #include <iostream>
 #include <functional>
+#include <random>
 #include "benchmark/benchmark.h"
 #include <dot.h>
 #include <misc.h>
@@ -35,7 +36,75 @@ SOFTWARE.
 const int fromRange = 16;
 const int toRange = 1<<20;
 
+static void BM_MultArray(benchmark::State& state) {
+    const int size = state.range (0);
+    std::vector<Vec4> m1;
+    std::vector<Vec4> m2;
+    m1.resize(size);
+    m2.resize(size);
+    std::default_random_engine generator;
+    std::uniform_real_distribution<float> randFunc(0.0f, 100.0f);
+    for(int i = 0; i < size; i++)
+    {
+        m1[i].x = randFunc(generator);
+        m1[i].y = randFunc(generator);
+        m1[i].z = randFunc(generator);
+        m1[i].w = randFunc(generator);
 
+        m2[i].x = randFunc(generator);
+        m2[i].y = randFunc(generator);
+        m2[i].z = randFunc(generator);
+        m2[i].w = randFunc(generator);
+
+    }
+    for (auto _ : state) {
+
+        benchmark::DoNotOptimize(MultArray (&m1[0], &m2[0], size));
+    }
+}
+BENCHMARK(BM_MultArray)->Range(fromRange, toRange);
+
+static void BM_MultArraySSE(benchmark::State &state) {
+    const int size = state.range (0);
+    std::vector<float> m1;
+    std::vector<float> m2;
+    m1.resize(size*4);
+    m2.resize(size*4);
+    std::default_random_engine generator;
+    std::uniform_real_distribution<float> randFunc(0.0f, 100.0f);
+    for(int i = 0; i < 4*size; i++)
+    {
+        m1[i] = randFunc(generator);
+        m2[i] = randFunc(generator);
+
+    }
+    for (auto _ : state) {
+
+        benchmark::DoNotOptimize(MultArraySSE(&m1[0], &m2[0], size));
+    }
+}
+BENCHMARK(BM_MultArraySSE)->Range(fromRange, toRange);
+
+static void BM_MultArrayAVX(benchmark::State &state) {
+    const int size = state.range (0);
+    std::vector<float> m1;
+    std::vector<float> m2;
+    m1.resize(size*4);
+    m2.resize(size*4);
+    std::default_random_engine generator;
+    std::uniform_real_distribution<float> randFunc(0.0f, 100.0f);
+    for(int i = 0; i < 4*size; i++)
+    {
+        m1[i] = randFunc(generator);
+        m2[i] = randFunc(generator);
+
+    }
+    for (auto _ : state) {
+
+        benchmark::DoNotOptimize(MultArrayAVX(&m1[0], &m2[0], size));
+    }
+}
+BENCHMARK(BM_MultArrayAVX)->Range(fromRange, toRange);
 
 static void BM_MultList(benchmark::State& state) {
   const int size = state.range (0);
