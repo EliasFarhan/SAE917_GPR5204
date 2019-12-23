@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 project(GPR5204)
-
-
+enable_language(ASM_NASM)
 
 if(UNIX AND NOT APPLE)
     MESSAGE("Linux Compiler ${CMAKE_CXX_COMPILER_ID}")
@@ -61,6 +60,19 @@ include_directories(CTPL/)
 include_directories(include/)
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
 
+file(GLOB_RECURSE ASM_FILES asm/*.asm)
+
+
+foreach(asm_file ${ASM_FILES})
+    get_filename_component(asm_name ${asm_file} NAME)
+    set(output_file ${CMAKE_BINARY_DIR}/asm/${asm_name}.o)
+    list(APPEND asm_out ${output_file})
+    add_custom_command(OUTPUT ${asm_name}.o COMMAND ${YASM_EXE}
+            ARGS -f elf64 -o ${CMAKE_BINARY_DIR}/asm/${asm_name}.o ${asm_file})
+endforeach()
+add_library(ASM_LIB ${ASM_FILES})
+set_target_properties(ASM_LIB PROPERTIES LINKER_LANGUAGE CXX)
+
 
 SET(COURSE_DIR ${CMAKE_SOURCE_DIR}/tests)
 file(GLOB COURSE_FILES ${COURSE_DIR}/*.cpp )
@@ -71,7 +83,7 @@ foreach(course_file ${COURSE_FILES} )
     string( REPLACE ".cpp" "" course_name ${course_relative_path} )
     add_executable(${course_name} ${course_file} ${SRC_FILES} src/job_system.cpp include/job_system.h include/misc.h)
     # Make sure YourLib is linked to each app
-    target_link_libraries(${course_name} PUBLIC benchmark)
+    target_link_libraries(${course_name} PUBLIC benchmark ASM_LIB)
     set_property(TARGET ${course_name} PROPERTY CXX_STANDARD 17)
 
 
