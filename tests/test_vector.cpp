@@ -4,6 +4,8 @@
 
 #include <random>
 #include <vector>
+
+#include <vector.h>
 #include <misc.h>
 #include <benchmark/benchmark.h>
 #ifdef WIN32
@@ -16,152 +18,139 @@
 #else
 #include <x86intrin.h>
 #endif
+const long fromRange = 8;
+const long toRange = 1 << 15;
+const float maxNmb = 100.0f;
 
-void VectorAdd1(float* a, float* b, float* out, int size)
+void RandomFill(std::vector<neko::Vec4f>& numbers, float start = -maxNmb, float end = maxNmb)
 {
-  for(int i = 0; i < size;i++)
-    {
-      out[i] = a[i]+b[i];
-    }
-}
-void VectorAdd2(const float* a, const float* b, float* out, const int size)
-{
-  for(int i = 0; i < size;i++)
-    {
-      out[i] = a[i]+b[i];
-    }
-}
-void VectorAdd3(const float* a, const float* b, float* __restrict out, const size_t size)
-{
-  for(int i = 0; i < size;i++)
-    {
-      out[i] = a[i]+b[i];
-    }
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::uniform_real_distribution<float> dist{ start, end };
+    std::generate(numbers.begin(), numbers.end(), [&g, &dist]() {return neko::Vec4f(dist(g), dist(g), dist(g), 0.0f); });
 }
 
-void VectorAdd4(const float* a, const float* b, float* out, const size_t size)
+size_t FindClosestNaive1(const neko::Vec4f* v, size_t len, neko::Vec4f r)
 {
-#ifdef __SSE__
-    for(size_t i = 0; i < size; i+=4)
-    {
-        __m128 v1 = _mm_load_ps(a + i);//equivalent to float[4] or Vec4
-        __m128 v2 = _mm_load_ps(b + i);//equivalent to float[4] or Vec4
-        v1 = _mm_add_ps(v1, v2);//equivalent to sum = sum + v1 * v2
-        _mm_store_ps(out+i, v1);
-    }
-#endif
+    assert(len != 0);
+    size_t closestIndex = 0;
+    float closestDistance = (v[0]-r).GetSquareMagnitude();
+	for(size_t i = 1; i < len; i++)
+	{
+        const auto delta = v[i] - r;
+        const auto distance = delta.GetSquareMagnitude();
+		if(delta.GetSquareMagnitude() < closestDistance)
+		{
+            closestIndex = i;
+            closestDistance = distance;
+		}
+	}
+    return closestIndex;
 }
 
-void VectorAdd8(const float* a, const float* b, float* out, const size_t size)
+size_t FindClosestNaive2(const neko::Vec4f* v, size_t len, neko::Vec4f r)
 {
-#ifdef __AVX2__
-    for(size_t i = 0; i < size; i+=8)
+    assert(len != 0);
+    size_t closestIndex = 0;
+    float closestDistance = -1.0f;
+    for (size_t i = 0; i < len; i++)
     {
-        __m256 v1 = _mm256_load_ps(a + i);
-        __m256 v2 = _mm256_load_ps(b + i);
-        v1 = _mm256_add_ps(v1, v2);
-        _mm256_store_ps(out+i, v1);
-
+        const auto delta = v[i] - r;
+        const auto distance = delta.GetSquareMagnitude();
+        if (closestDistance < 0.0f || delta.GetSquareMagnitude() < closestDistance)
+        {
+            closestIndex = i;
+            closestDistance = distance;
+        }
     }
-#endif
+    return closestIndex;
+}
+size_t FindClosestAoSoA4(const neko::Vec4f* v, size_t len, neko::Vec4f r)
+{
+    assert(len != 0);
+    size_t closestIndex = 0;
+    float closestDistance = -1.0f;
+    for (size_t i = 0; i < len; i+=4)
+    {
+        neko::FourVec4f vArray(&v[i]);
+        vArray -= r;
+        const auto magnitudes = vArray.GetSquareMagnitude();
+        const auto minMagn = std::min_element(magnitudes.cbegin(), magnitudes.cend());
+    	if(closestDistance < 0.0f || *minMagn < closestDistance)
+    	{
+            closestDistance = *minMagn;
+            closestIndex = i + (minMagn - magnitudes.cbegin());
+    	}
+    }
+    return closestIndex;
+}
+size_t FindClosestAoSoA8(const neko::Vec4f* v, size_t len, neko::Vec4f r)
+{
+    assert(len != 0);
+    size_t closestIndex = 0;
+    float closestDistance = -1.0f;
+    for (size_t i = 0; i < len; i += 8)
+    {
+        neko::EightVec4f vArray(&v[i]);
+        vArray -= r;
+        const auto magnitudes = vArray.GetSquareMagnitude();
+        const auto minMagn = std::min_element(magnitudes.cbegin(), magnitudes.cend());
+        if (closestDistance < 0.0f || *minMagn < closestDistance)
+        {
+            closestDistance = *minMagn;
+            closestIndex = i + (minMagn - magnitudes.cbegin());
+        }
+    }
+    return closestIndex;
 }
 
-static void BM_Add1(benchmark::State& state) {
-  const int size = state.range (0);
-  std::vector<float> m1;
-  m1.resize (size);
-  RandomFill (&m1[0], size);
-
-  std::vector<float> m2;
-  m2.resize ( size);
-  RandomFill (&m2[0], size);
-
-  std::vector<float> out;
-  out.resize ( size);
+static void BM_ClosestNaive(benchmark::State& state) {
+  const size_t size = state.range (0);
+  std::vector<neko::Vec4f> m1;
+  m1.resize (size+1);
+  RandomFill (m1);
   for (auto _ : state) {
 
-      VectorAdd1(&m1[0],&m2[0],&out[0], size);
+      benchmark::DoNotOptimize(FindClosestNaive1(m1.data(), size, m1[size]));
     }
 }
-BENCHMARK(BM_Add1)->Range(16, 8<<20);
-
-static void BM_Add2(benchmark::State& state) {
-  const int size = state.range (0);
-  std::vector<float> m1;
-  m1.resize (size);
-  RandomFill (&m1[0], size);
-
-  std::vector<float> m2;
-  m2.resize ( size);
-  RandomFill (&m2[0], size);
-
-  std::vector<float> out;
-  out.resize ( size);
-
-  for (auto _ : state) {
-
-      VectorAdd2(&m1[0],&m2[0],&out[0], size);
-    }
-}
-BENCHMARK(BM_Add2)->Range(16, 8<<20);
-static void BM_Add3(benchmark::State& state) {
-  const int size = state.range (0);
-  std::vector<float> m1;
-  m1.resize (size);
-  RandomFill (&m1[0], size);
-
-  std::vector<float> m2;
-  m2.resize ( size);
-  RandomFill (&m2[0], size);
+BENCHMARK(BM_ClosestNaive)->Range(fromRange, toRange);
 
 
-  std::vector<float> out;
-  out.resize ( size);
-  for (auto _ : state) {
-
-      VectorAdd3(&m1[0],&m2[0],&out[0], size);
-    }
-}
-BENCHMARK(BM_Add3)->Range(16, 8<<20);
-
-static void BM_Add4(benchmark::State& state) {
-    const int size = state.range (0);
-    std::vector<float> m1;
-    m1.resize (size);
-    RandomFill (&m1[0], size);
-
-    std::vector<float> m2;
-    m2.resize ( size);
-    RandomFill (&m2[0], size);
-
-
-    std::vector<float> out;
-    out.resize ( size);
+static void BM_ClosestNaive2(benchmark::State& state) {
+    const size_t size = state.range(0);
+    std::vector<neko::Vec4f> m1;
+    m1.resize(size + 1);
+    RandomFill(m1);
     for (auto _ : state) {
 
-        VectorAdd4(&m1[0],&m2[0],&out[0], size);
+        benchmark::DoNotOptimize(FindClosestNaive2(m1.data(), size, m1[size]));
     }
 }
-BENCHMARK(BM_Add4)->Range(16, 8<<20);
+BENCHMARK(BM_ClosestNaive2)->Range(fromRange, toRange);
 
-static void BM_Add8(benchmark::State& state) {
-    const int size = state.range (0);
-    std::vector<float> m1;
-    m1.resize (size);
-    RandomFill (&m1[0], size);
-
-    std::vector<float> m2;
-    m2.resize ( size);
-    RandomFill (&m2[0], size);
-
-
-    std::vector<float> out;
-    out.resize ( size);
+static void BM_ClosestAoSoA4(benchmark::State& state) {
+    const size_t size = state.range(0);
+    std::vector<neko::Vec4f> m1;
+    m1.resize(size + 1);
+    RandomFill(m1);
     for (auto _ : state) {
 
-        VectorAdd8(&m1[0],&m2[0],&out[0], size);
+        benchmark::DoNotOptimize(FindClosestAoSoA4(m1.data(), size, m1[size]));
     }
 }
-BENCHMARK(BM_Add8)->Range(16, 8<<20);
+BENCHMARK(BM_ClosestAoSoA4)->Range(fromRange, toRange);
+
+static void BM_ClosestAoSoA8(benchmark::State& state) {
+    const size_t size = state.range(0);
+    std::vector<neko::Vec4f> m1;
+    m1.resize(size + 1);
+    RandomFill(m1);
+    for (auto _ : state) {
+
+        benchmark::DoNotOptimize(FindClosestAoSoA8(m1.data(), size, m1[size]));
+    }
+}
+BENCHMARK(BM_ClosestAoSoA8)->Range(fromRange, toRange);
 
 BENCHMARK_MAIN ();
