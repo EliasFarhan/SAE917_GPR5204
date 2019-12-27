@@ -26,6 +26,7 @@
 #include <ostream>
 #include <array>
 #include <cmath>
+#include <algorithm>
 
 namespace neko
 {
@@ -464,7 +465,7 @@ struct alignas(N*sizeof(T)) NVec4
 
     NVec4<T, N> operator-(const Vec4<T>& rhs) const
     {
-        NVec4<T> v = this;
+        NVec4<T, N> v = this;
         std::for_each(v.xs.begin(), v.xs.end(), [rhs](T x) {return x - rhs.x; });
         std::for_each(v.ys.begin(), v.ys.end(), [rhs](T y) {return y - rhs.y; });
         std::for_each(v.zs.begin(), v.zs.end(), [rhs](T z) {return z - rhs.z; });

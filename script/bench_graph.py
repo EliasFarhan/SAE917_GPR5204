@@ -29,6 +29,7 @@ def plot(bench_dict):
         y = list(map(lambda xy : xy[1], bench_dict[bench_name]))
 
         plt.plot(x, y, label=bench_name)
+    plt.xscale("log")
     plt.xlabel("Range")
     plt.yscale("log")
     plt.ylabel("Time (ns)")
