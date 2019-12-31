@@ -44,8 +44,8 @@ void VectorAdd4(const float* a, const float* b, float* out, const size_t size)
 #ifdef __SSE__
     for(size_t i = 0; i < size; i+=4)
     {
-        __m128 v1 = _mm_load_ps(a + i);//equivalent to float[4] or Vec4
-        __m128 v2 = _mm_load_ps(b + i);//equivalent to float[4] or Vec4
+        auto v1 = _mm_load_ps(a + i);//equivalent to float[4] or Vec4
+        auto v2 = _mm_load_ps(b + i);//equivalent to float[4] or Vec4
         v1 = _mm_add_ps(v1, v2);//equivalent to sum = sum + v1 * v2
         _mm_store_ps(out+i, v1);
     }
@@ -57,8 +57,8 @@ void VectorAdd8(const float* a, const float* b, float* out, const size_t size)
 #ifdef __AVX2__
     for(size_t i = 0; i < size; i+=8)
     {
-        __m256 v1 = _mm256_load_ps(a + i);
-        __m256 v2 = _mm256_load_ps(b + i);
+        auto v1 = _mm256_load_ps(a + i);//float[8]
+        auto v2 = _mm256_load_ps(b + i);//float[8]
         v1 = _mm256_add_ps(v1, v2);
         _mm256_store_ps(out+i, v1);
 
