@@ -83,15 +83,15 @@ foreach(course_file ${COURSE_FILES} )
     string( REPLACE ".cpp" "" course_name ${course_relative_path} )
     add_executable(${course_name} ${course_file} ${SRC_FILES} src/job_system.cpp include/job_system.h include/misc.h)
     # Make sure YourLib is linked to each app
-    target_link_libraries(${course_name} PUBLIC benchmark ASM_LIB)
+    target_link_libraries(${course_name} PUBLIC benchmark)
     set_property(TARGET ${course_name} PROPERTY CXX_STANDARD 17)
 
 
 	IF(MSVC)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2 /Oi")
-    elseif(UNIX)
-    set_target_properties(${course_name} PROPERTIES COMPILE_FLAGS "-save-temps -ffast-math -march=native")
-    ENDIF(MSVC)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2 /Oi /Oy-")
+    else()
+    set_target_properties(${course_name} PROPERTIES COMPILE_FLAGS "-save-temps -march=native -fno-omit-frame-pointer")
+    ENDIF()
     set_target_properties (${course_name} PROPERTIES
         FOLDER Courses)
     IF(APPLE)
@@ -109,7 +109,7 @@ foreach(course_file ${COURSE_GRAPHICS_FILES} )
     string( REPLACE ".cu" "" course_name ${course_relative_path} )
     add_executable(${course_name} ${course_file})
     # Make sure YourLib is linked to each app
-    target_link_libraries(${course_name} PUBLIC benchmark)
+    target_link_libraries(${course_name} PUBLIC benchmark ASM_LIB)
     set_property(TARGET ${course_name} PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 
     set_target_properties (${course_name} PROPERTIES

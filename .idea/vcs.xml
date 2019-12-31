@@ -4,6 +4,5 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/CTPL" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/benchmark" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/benchmark/googletest" vcs="Git" />
   </component>
 </project>
