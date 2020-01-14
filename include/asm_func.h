@@ -32,6 +32,8 @@ struct vec3
 };
 
 int dot_vec3(vec3 v1, vec3 v2);
+//float.asm
+float pythagoras(float a, float b);
 #ifdef __cplusplus
 }
 #endif

@@ -48,5 +48,9 @@ int main() {
     vec3 v_1 = {1,2,3};
     vec3 v_2 = {3,2,-1};
     std::cout << "Dot product: "<<dot_vec3(v_1, v_2)<<'\n';
+
+    float a_1 = 1.0f;
+    float b_1 = 2.0f;
+    std::cout << "A: "<<a_1<<", B: "<<b_1<<", A^2+B^2: "<<pythagoras (a_1, b_1)<<'\n';
     return 0;
 }
