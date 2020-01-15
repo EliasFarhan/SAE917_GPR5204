@@ -1,3 +1,7 @@
+
+section .data
+pi equ 3.1419
+section .text
 global pythagoras
 pythagoras:
     mulss xmm0, xmm0
