@@ -25,7 +25,6 @@ int shiftr(int);
 
 //array.asm
 int avg(const int* v, size_t length);
-float avg_float(const int* v, size_t length);
 struct vec3
 {
     int x,y,z;

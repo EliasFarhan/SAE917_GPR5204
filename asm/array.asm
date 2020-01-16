@@ -15,24 +15,6 @@ avg:;(int const*, unsigned long):
         div     rsi ; divide rdx:rax with rsi, length is always positive so div instead of idiv
 .L1:
         ret ; rax:eax is return
-global avg_float
-avg_float:;(int const*, unsigned long):
-        mov eax, 0
-        cvtsi2ss   xmm0, eax ; xmm0 is return value
-        test    rsi, rsi ; check if rsi (second argument) is 0
-        je      .L1 ; we jump if it's true
-        cvtsi2ss xmm1, rsi ; convert length to float
-        mov     rcx, rdi ; move rdi (pointer) to rcx
-        lea     rdx, [rdi+rsi*4] ; load the address of the end to rdx
-.L3:
-        add     eax, DWORD [rcx] ; result += v[i]
-        add     rcx, 4 ; i++
-        cmp     rcx, rdx ; compare rcx address is end of array
-        jne     .L3 ; if false we jump back
-        cvtsi2ss xmm0, eax ; convert result to float
-        divss    xmm0, xmm1 ; divide rdx:rax with rsi, length is always positive so div instead of idiv
-.L1:
-        ret ; rax:eax is return
 
 global dot_vec3
 dot_vec3:;(vec3, vec3):                          # @dot(vec3, vec3)

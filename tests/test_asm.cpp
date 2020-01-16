@@ -48,8 +48,6 @@ int main() {
         std::array<int, 8> values;
         std::iota(values.begin(), values.end(), 1);
         std::cout << "Values avg: " << avg(values.data(), values.size()) << '\n';
-        std::array<int, 3> values2{2, 3, 2};
-        std::cout << "Values avg_float: " << avg_float(values2.data(), values2.size()) << '\n';
     }
     {
         vec3 v_1 = {1, 2, 3};
