@@ -37,7 +37,7 @@ static void BM_AsmAvg(benchmark::State &state) {
 
     for (auto _ : state) {
 
-        benchmark::DoNotOptimize(avg(v.data(), v.size()));
+        benchmark::DoNotOptimize(classroom_avg(v.data(), v.size()));
     }
 }
 

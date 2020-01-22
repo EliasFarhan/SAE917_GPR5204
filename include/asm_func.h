@@ -7,7 +7,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+//classroom.asm
+int classroom_avg(const int* v, size_t length);
 //swap.asm
 void swap_int(int *a, int *b);
 void swap_float(float *a, float *b);
