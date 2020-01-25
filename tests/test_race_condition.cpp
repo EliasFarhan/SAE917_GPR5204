@@ -1,52 +1,73 @@
-//
-// Created by efarhan on 1/10/19.
-//
-
+#include <vector>
 #include <thread>
 #include <iostream>
-#include <chrono>
-#include <mutex>
+#include <benchmark/benchmark.h>
+#include <misc.h>
 
-static std::mutex mtx;
+const size_t total = 10000;
 
-void MrPlus(int* prout)
+class Wallet
 {
-  for(int i = 0; i < 1000; i++)
+    int mMoney;
+public:
+    Wallet()
+        : mMoney(0)
     {
-      std::lock_guard<std::mutex> lock(mtx);
-      (*prout) += 4;
     }
+    int GetMoney()
+    {
+        return mMoney;
+    }
+    NOINLINE void IncMoney();
 
+    void AddMoney(size_t money)
+    {
+        for (size_t i = 0; i < money; ++i)
+        {
+            IncMoney();
+        }
+    }
+};
+void Wallet::IncMoney()
+{
+mMoney++;
 }
 
-
-void MrMinus(int* prout)
+int TestMultithreadedWallet(int totalThread)
 {
-  for(int i = 0; i < 1000; i++)
+    Wallet walletObject;
+    std::vector<std::thread> threads;
+    for (int i = 0; i < totalThread; ++i)
     {
-
-      std::lock_guard<std::mutex> lock(mtx);
-      (*prout) -= 4;
+        threads.push_back(std::thread(&Wallet::AddMoney, &walletObject, total));
     }
+
+    for (int i = 0; i < threads.size(); i++)
+    {
+        threads.at(i).join();
+    }
+    return walletObject.GetMoney();
 }
 
 int main()
 {
-  int prout = 0;
-  std::thread t1(MrPlus, &prout);
-  std::thread t2(MrMinus, &prout);
-  std::thread t3(MrPlus, &prout);
-  std::thread t4(MrMinus, &prout);
-  std::thread t5(MrPlus, &prout);
-  std::thread t6(MrMinus, &prout);
 
-  t1.join ();
-  t2.join ();
-  t3.join ();
-  t4.join ();
-  t5.join ();
-  t6.join ();
+    int val = 0;
 
-  std::cout << "Prout: " << (prout) <<"\n";
+    for(int totalThread = 1; totalThread < 8; totalThread++)
+    {
+        int errorCount = 0;
+        for (size_t k = 0; k < total; k++)
+        {
+            if ((val = TestMultithreadedWallet(totalThread)) != total*totalThread)
+            {
+                std::cout << "Error at count = " << k << " Money in Wallet = " << val << std::endl;
+                errorCount++;
+            }
+
+        }
+
+        std::cout << "Total error count: " << errorCount << " over 1000 with threads number: "<<totalThread<<"\n";
+    }
+    return 0;
 }
-

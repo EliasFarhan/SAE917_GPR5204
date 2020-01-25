@@ -11,11 +11,11 @@ int2long:
 global bad_shiftr
 bad_shiftr:
     mov eax, edi
-    shl eax, 1
+    shr eax, 1
     ret
 global shiftr
 shiftr:
     mov eax, edi
-    sal eax, 1
+    sar eax, 1
     ret
 

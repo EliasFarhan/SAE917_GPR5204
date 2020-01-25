@@ -30,6 +30,8 @@ struct vec3
 {
     int x,y,z;
 };
+size_t count_positive(const float* v, size_t length);
+size_t count_positive_o1(float const*, size_t);
 
 int dot_vec3(vec3 v1, vec3 v2);
 //float.asm

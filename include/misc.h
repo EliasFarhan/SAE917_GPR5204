@@ -1,12 +1,11 @@
 //
 // Created by efarhan on 22.12.18.
 //
-
-#ifndef GPR5204_MISC_H
-#define GPR5204_MISC_H
+#pragma once
 
 #include <random>
 #include <vector>
+#include <vector.h>>
 
 
 const float maxNmb = 100.0f;
@@ -27,4 +26,8 @@ void RandomFill(std::vector<neko::Vec4f>& numbers, float start = -maxNmb, float 
     std::generate(numbers.begin(), numbers.end(), [&g, &dist]() {return neko::Vec4f(dist(g), dist(g), dist(g), 0.0f); });
 }
 
-#endif //GPR5204_MISC_H
+#ifdef WIN32
+#define NOINLINE __declspec(noinline)
+#else
+#define NOINLINE __attribute__((noinline))
+#endif

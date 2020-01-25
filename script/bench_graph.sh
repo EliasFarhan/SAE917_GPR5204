@@ -10,9 +10,9 @@ if [[ $# -eq 2 ]]
 fi
 echo "Benchmarking..."
 if [ "$filter" == "" ]
-  then "./$filename" --benchmark_format=json > "$json_filename"
+  then "./$filename" --benchmark_out_format=json --benchmark_out="$json_filename"
 else
-  "./$filename" --benchmark_format=json --benchmark_filter="$filter" > "$json_filename"
+  "./$filename" --benchmark_out_format=json --benchmark_filter="$filter" --benchmark_out="$json_filename"
 fi
 
 

@@ -27,3 +27,44 @@ dot_vec3:;(vec3, vec3):                          # @dot(vec3, vec3)
         add     eax, esi ; result += z1 * z2
         add     eax, edx ; result += y1 * y2
         ret
+global count_positive
+count_positive:
+    mov     rax, 0 ; eax is the return value
+    test    rsi, rsi ; check if rsi (second argument) is 0
+    je      end_count ; we jump if it's true
+    mov     rcx, rdi ; move rdi (pointer) to rcx
+    lea     rdx, [rdi+rsi*4] ; load the address of the end to rdx
+    xorps xmm1, xmm1
+count_loop:
+    movss xmm0, [rdx]
+    ucomiss xmm0, xmm1
+    jbe end_count_loop
+    inc rax
+end_count_loop:
+    add     rcx, 4 ; i++
+    cmp     rcx, rdx ; compare rcx address is end of array
+    jne     count_loop ; if false we jump back
+end_count:
+    ret
+
+global count_positive_o1
+count_positive_o1:;(float const*, unsigned long):
+        test    rsi, rsi
+        je      .countL4
+        mov     rdx, rdi
+        lea     rsi, [rdi+rsi*4]
+        mov     eax, 0
+        pxor    xmm1, xmm1
+.countL3:
+        movss   xmm0, DWORD [rdx]
+        comiss  xmm0, xmm1
+        seta    cl
+        movzx   ecx, cl
+        add     rax, rcx
+        add     rdx, 4
+        cmp     rdx, rsi
+        jne     .countL3
+        ret
+.countL4:
+        mov     rax, rsi
+        ret
