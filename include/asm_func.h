@@ -33,6 +33,9 @@ struct vec3
 int dot_vec3(vec3 v1, vec3 v2);
 //float.asm
 float pythagoras(float a, float b);
+
+//count positive
+size_t count_positive(const float* v, size_t length);
 #ifdef __cplusplus
 }
 #endif

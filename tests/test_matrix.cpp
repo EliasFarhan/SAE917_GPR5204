@@ -42,7 +42,7 @@ public:
 	{
 		for (auto& v : values)
 		{
-			v = static_cast<float>(rand());
+			v = static_cast<float>(rand()%100);
 		}
 
 	}
@@ -104,7 +104,7 @@ public:
               {
                 const int xOrigin = x*m2T.width;
                 const int yOrigin = y*width;
-                float newValue = MultLocal16 (&values[yOrigin], &m2T.values[xOrigin], localWidth);
+                const float newValue = MultLocal16 (&values[yOrigin], &m2T.values[xOrigin], localWidth);
                 newMatrix.values[x*newWidth+y] = newValue;
               }
           }

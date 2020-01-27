@@ -1,3 +1,4 @@
+section .text
 global avg
 avg:;(int const*, unsigned long):
         mov     eax, 0 ; eax is the return value
@@ -27,3 +28,23 @@ dot_vec3:;(vec3, vec3):                          # @dot(vec3, vec3)
         add     eax, esi ; result += z1 * z2
         add     eax, edx ; result += y1 * y2
         ret
+
+global count_positive
+count_positive: ; (const float*, size_t)
+    mov     rax, 0 ; eax is the return value
+    test    rsi, rsi ; check if rsi (second argument) is 0
+    je      _end_count ; we jump if it's true
+    mov     rcx, rdi ; move rdi (pointer) to rcx
+    lea     rdx, [rdi+rsi*4] ; load the address of the end to rdx
+    xorps xmm1, xmm1
+_count_loop:
+    movss xmm0, [rcx]
+    ucomiss xmm0, xmm1
+    jb _end_count_loop
+    inc rax
+_end_count_loop:
+    add rcx, 4
+    cmp rcx, rdx
+    jne _count_loop
+_end_count:
+    ret
