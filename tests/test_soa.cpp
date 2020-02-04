@@ -28,6 +28,7 @@ SOFTWARE.
 #include <benchmark/benchmark.h>
 #include <memory>
 #include <cmath>
+#include "intrinsincs_wrapper.h"
 
 
 #define ENTITY_NUMBERS (1'024*1'024)
@@ -289,17 +290,62 @@ struct FourPos
 {
     std::array<float, 4> posX;
     std::array<float, 4> posY;
+
+#ifdef __SSE__
+    void Translate(sfge::Vec2f moveValue)
+    {
+        auto x = _mm_load1_ps(&moveValue.x);
+        auto y = _mm_load1_ps(&moveValue.y);
+
+        auto px = _mm_load_ps(posX.data());
+        auto py = _mm_load_ps(posY.data());
+
+        px = _mm_add_ps(px, x);
+        py = _mm_add_ps(py, y);
+
+        _mm_store_ps(posX.data(), px);
+        _mm_store_ps(posY.data(), py);
+    }
+#endif
+
 };
 struct FourScale
 {
 
     std::array<float, 4> scaleX;
     std::array<float, 4> scaleY;
+
+#ifdef __SSE__
+    void Scale(float scaleValue)
+    {
+        auto x = _mm_load1_ps(&scaleValue);
+
+        auto px = _mm_load_ps(scaleX.data());
+        auto py = _mm_load_ps(scaleY.data());
+
+        px = _mm_mul_ps(px, x);
+        py = _mm_mul_ps(py, x);
+
+        _mm_store_ps(scaleX.data(), px);
+        _mm_store_ps(scaleY.data(), py);
+    }
+#endif
 };
 
 struct FourAngle
 {
     std::array<float, 4> eulerAngles;
+#ifdef __SSE__
+    void Rotate(float angle)
+    {
+        auto a = _mm_load1_ps(&angle);
+        auto as = _mm_load_ps(eulerAngles.data());
+
+        as = _mm_add_ps(a, as);
+
+        _mm_store_ps(eulerAngles.data(), as);
+    }
+#endif
 };
 class TransformSystem
 {
@@ -355,6 +401,29 @@ public:
             }
         }
     }
+
+    void TranslateInstrinsics(sfge::Vec2f moveValue)
+    {
+
+        for (auto& pos : m_Positions)
+        {
+            pos.Translate(moveValue);
+        }
+    }
+    void ScaleIntrinsics(float scaleValue)
+    {
+        for (auto& scale : m_Scales)
+        {
+            scale.Scale(scaleValue);
+        }
+    }
+    void RotateIntrinsics(float rotateValue)
+    {
+        for (auto& angle : m_EulerAngles)
+        {
+            angle.Rotate(rotateValue);
+        }
+    }
 private:
     std::vector<FourPos> m_Positions;
     std::vector<FourScale> m_Scales;
@@ -397,5 +466,18 @@ static void BM_AOSOA(benchmark::State& state) {
     }
 }
 BENCHMARK(BM_AOSOA);
+
+#ifdef __SSE__
+static void BM_AOSOAIntrinsics(benchmark::State& state) {
+    auto transformSystem = std::make_unique<AOSOA::TransformSystem>();
+    for (auto _ : state)
+    {
+        transformSystem->TranslateInstrinsics(sfge::Vec2f(22.0f, -4.0f));
+        transformSystem->ScaleIntrinsics(3.0f);
+        transformSystem->RotateIntrinsics(45.0f);
+    }
+}
+BENCHMARK(BM_AOSOAIntrinsics);
+#endif
 
 BENCHMARK_MAIN();
