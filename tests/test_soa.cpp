@@ -283,6 +283,85 @@ namespace AOS
     };
 }
 
+namespace AOSOA
+{
+struct FourPos
+{
+    std::array<float, 4> posX;
+    std::array<float, 4> posY;
+};
+struct FourScale
+{
+
+    std::array<float, 4> scaleX;
+    std::array<float, 4> scaleY;
+};
+
+struct FourAngle
+{
+    std::array<float, 4> eulerAngles;
+};
+class TransformSystem
+{
+public:
+    TransformSystem()
+    {
+        m_Positions.resize(ENTITY_NUMBERS/4);
+        m_Scales.resize(ENTITY_NUMBERS / 4);
+        m_EulerAngles.resize(ENTITY_NUMBERS / 4);
+        for (int i = 0; i < ENTITY_NUMBERS / 4; i++)
+        {
+        	for(int j = 0; j < 4; j++)
+        	{
+
+                m_Positions[i].posX[j] = rand();
+                m_Positions[i].posY[j] = rand();
+                m_Scales[i].scaleX[j] = rand();
+                m_Scales[i].scaleY[j] = rand();
+                m_EulerAngles[i].eulerAngles[j] = rand();
+        	}
+        }
+    }
+    void Translate(sfge::Vec2f moveValue)
+    {
+
+        for (auto& pos : m_Positions)
+        {
+        	for(int j = 0; j < 4; j++)
+        	{
+                pos.posX[j] += moveValue.x;
+                pos.posY[j] += moveValue.y;
+        	}
+        }
+    }
+    void Scale(float scaleValue)
+    {
+        for (auto& scale : m_Scales)
+        {
+        	for(int j = 0; j < 4; j++)
+        	{
+                scale.scaleX[j] *= scaleValue;
+                scale.scaleY[j] *= scaleValue;
+        	}
+        }
+    }
+    void Rotate(float rotateValue)
+    {
+        for (auto& angle : m_EulerAngles)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+				angle.eulerAngles[j] += rotateValue;
+            }
+        }
+    }
+private:
+    std::vector<FourPos> m_Positions;
+    std::vector<FourScale> m_Scales;
+    std::vector<FourAngle> m_EulerAngles;
+};
+}
+
 static void BM_AOS(benchmark::State& state)
 {
     auto transformSystem = std::make_unique<AOS::TransformSystem>();
@@ -307,5 +386,16 @@ static void BM_SOA(benchmark::State& state) {
     }
 }
 BENCHMARK(BM_SOA);
+
+static void BM_AOSOA(benchmark::State& state) {
+    auto transformSystem = std::make_unique<AOSOA::TransformSystem>();
+    for (auto _ : state)
+    {
+        transformSystem->Translate(sfge::Vec2f(22.0f, -4.0f));
+        transformSystem->Scale(3.0f);
+        transformSystem->Rotate(45.0f);
+    }
+}
+BENCHMARK(BM_AOSOA);
 
 BENCHMARK_MAIN();
