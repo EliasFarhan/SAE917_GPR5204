@@ -281,13 +281,11 @@ private:
 namespace AOSOA
 {
 template<size_t N>
-struct NPos
+struct  alignas(N * sizeof(float)) NPos
 {
     std::array<float, N> posX;
     std::array<float, N> posY;
     void TranslateIntrinsics(sfge::Vec2f moveValue);
-
-
 };
 #ifdef __SSE__
 template<>
@@ -325,14 +323,11 @@ inline void NPos<8>::TranslateIntrinsics(sfge::Vec2f moveValue)
 #endif
 
 template<size_t N>
-struct NScale
+struct  alignas(N * sizeof(float)) NScale
 {
-
     std::array<float, N> scaleX;
     std::array<float, N> scaleY;
-
     void ScaleIntrinsics(float scaleValue);
-
 };
 
 #ifdef __SSE__
@@ -369,7 +364,7 @@ inline void NScale<8>::ScaleIntrinsics(float scaleValue)
 #endif
 
 template <size_t N>
-struct NAngle
+struct  alignas(N * sizeof(float)) NAngle
 {
     std::array<float, N> eulerAngles;
 

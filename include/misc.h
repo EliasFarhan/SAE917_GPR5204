@@ -5,7 +5,7 @@
 
 #include <random>
 #include <vector>
-#include <vector.h>>
+#include <vector.h>
 
 
 const float maxNmb = 100.0f;

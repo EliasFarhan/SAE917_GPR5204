@@ -21,7 +21,7 @@ const long fromRange = 8;
 const long toRange = 1 << 15;
 
 
-size_t FindClosestNaive1(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
+inline size_t FindClosestNaive1(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
     assert(len != 0);
     size_t closestIndex = 0;
     float closestDistance = (v[0] - r).GetSquareMagnitude();
@@ -36,7 +36,7 @@ size_t FindClosestNaive1(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
     return closestIndex;
 }
 
-size_t FindClosestNaive2(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
+inline size_t FindClosestNaive2(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
     assert(len != 0);
     size_t closestIndex = 0;
     float closestDistance = std::numeric_limits<float>::max();
@@ -51,7 +51,7 @@ size_t FindClosestNaive2(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
     return closestIndex;
 }
 
-size_t FindClosestAoSoA4(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
+inline size_t FindClosestAoSoA4(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
     assert(len != 0);
     size_t closestIndex = 0;
     float closestDistance = std::numeric_limits<float>::max();
@@ -70,7 +70,7 @@ size_t FindClosestAoSoA4(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
     return closestIndex;
 }
 
-size_t FindClosestAoSoA8(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
+inline size_t FindClosestAoSoA8(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
     assert(len != 0);
     size_t closestIndex = 0;
     float closestDistance =  std::numeric_limits<float>::max();
@@ -87,7 +87,7 @@ size_t FindClosestAoSoA8(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
     }
     return closestIndex;
 }
-size_t FindClosestAoSoA4Intrinsics(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
+inline size_t FindClosestAoSoA4Intrinsics(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
     assert(len != 0);
     size_t closestIndex = 0;
     float closestDistance = std::numeric_limits<float>::max();
@@ -106,7 +106,7 @@ size_t FindClosestAoSoA4Intrinsics(const neko::Vec4f *v, size_t len, neko::Vec4f
     return closestIndex;
 }
 
-size_t FindClosestAoSoA8Intrinsics(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
+inline size_t FindClosestAoSoA8Intrinsics(const neko::Vec4f *v, size_t len, neko::Vec4f r) {
     assert(len != 0);
     size_t closestIndex = 0;
     float closestDistance =  std::numeric_limits<float>::max();
