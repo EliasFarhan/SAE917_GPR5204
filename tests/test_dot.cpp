@@ -83,7 +83,7 @@ static void BM_MultArraySSE(benchmark::State &state) {
         benchmark::DoNotOptimize(MultArraySSE(&m1[0], &m2[0], size));
     }
 }
-BENCHMARK(BM_AsmAvg)->Range(fromRange, toRange);
+BENCHMARK(BM_MultArraySSE)->Range(fromRange, toRange);
 
 static void BM_MultArrayAVX(benchmark::State &state) {
     const int size = state.range (0);

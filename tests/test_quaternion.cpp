@@ -32,7 +32,7 @@ Quaternion AxisAngle(const Vec3f axis, const float angle)
       axis.x*sina,
       axis.y*sina,
       axis.z*sina,
-      cos(angle/2.0f),
+      std::cos(angle/2.0f),
   };
   return q;
 }
